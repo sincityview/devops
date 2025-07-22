@@ -2,4 +2,4 @@
 ------
 
 ##### Services:
- [gogs](./gogs/) - docker compose self-hosted git service
+[gogs](./gogs/) - docker compose self-hosted git service
