@@ -1,5 +1,7 @@
 #### Path to DevOps
 ------
 
-##### Services
+<br />
+
+##### Services:
  [gogs](./gogs/) - docker compose self-hosted Gogs service
