@@ -11,7 +11,7 @@ services:
     networks:
       backend:
     ports:
-      - "3306:3306"
+      - "10.1.1.1:3306:3306"
 
   gogs:
     image: gogs/gogs:0.13.3

@@ -1,4 +1,5 @@
-###### Self-hosted Gogs
+##### Self-hosted Gogs
+------
 
 **Go to service directory**
 ```
@@ -15,7 +16,7 @@ docker compose up -d
 http://server_ip/
 ```
 
-**Create admin user**
+**Create Gogs admin user**
 ```
 docker exec -it -u git gogs bash -c \
     "./gogs admin create-user \
@@ -30,8 +31,10 @@ docker exec -it -u git gogs bash -c \
 http://server_ip/dozzle
 ```
 
-**docker compose ps**
+**Output**
 ```
+$ docker compose ps
+ 
  Name                Command                  State                          Ports                   
 -----------------------------------------------------------------------------------------------------
 dozzle    /dozzle                          Up             10.1.1.1:8002->8080/tcp                    
