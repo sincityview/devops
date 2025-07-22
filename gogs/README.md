@@ -1,4 +1,4 @@
-##### Self-hosted Gogs
+#### Self-hosted Gogs
 ------
 
 **Go to service directory**
