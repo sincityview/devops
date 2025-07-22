@@ -29,3 +29,12 @@ docker exec -it -u git gogs bash -c \
 ```
 http://server_ip/dozzle
 ```
+
+**docker compose ps**
+```
+ Name                Command                  State                          Ports                   
+-----------------------------------------------------------------------------------------------------
+dozzle    /dozzle                          Up             10.1.1.1:8002->8080/tcp                    
+gogs      /app/gogs/docker/start.sh  ...   Up (healthy)   0.0.0.0:22->22/tcp, 10.1.1.1:8001->3000/tcp
+mariadb   docker-entrypoint.sh mariadbd    Up             10.1.1.1:3306->3306/tcp  
+```
