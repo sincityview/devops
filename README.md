@@ -1,1 +1,3 @@
-Tue Jul 22 10:11:18 AM MSK 2025
+Path to DevOps
+
+[gogs](./gogs/) - docker compose self-hosted Gogs service
