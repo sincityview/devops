@@ -1,5 +1,3 @@
-#### Path to DevOps
-
 ###### Self-hosted Gogs
 
 **Go to service directory**
