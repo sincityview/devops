@@ -2,5 +2,4 @@
 ------
 
 ##### Services
-
-[gogs](./gogs/) - docker compose self-hosted Gogs service
+* [gogs](./gogs/) - docker compose self-hosted Gogs service
