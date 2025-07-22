@@ -22,8 +22,8 @@ services:
     networks:
       backend:
     ports:
-      - "2222:22"
-      - "8001:3000"
+      - "22:22"
+      - "10.1.1.1:8001:3000"
     depends_on:
       - mariadb
 
@@ -38,7 +38,7 @@ services:
     networks:
       backend:
     ports:
-      - "8002:8080"
+      - "10.1.1.1:8002:8080"
 
   nginx:
     image: nginx:1.29
@@ -49,8 +49,7 @@ services:
     networks:
       frontend:
     ports:
-      - "80:80"
-      - "443:443"
+      - "10.1.1.1:80:80"
 
 volumes:
   mariadb:
