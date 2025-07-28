@@ -4,11 +4,17 @@
 **Scheme**
 ```mermaid
 flowchart LR
-    A[Host:Nginx] --> B[Docker:Nginx]
-    B --> C[Dozzle]
-    B --> D[Portainer]
-    B --> E[Registry]
-    B --> F[Registry-UI]
+    A["`**Host: Nginx**
+    Ports: 443:81`"] --> B["`**Docker: Nginx**
+    Ports: 81:80`"]
+    B --> C["`**Dozzle**
+    Ports: 8000:5000`"]
+    B --> D["`**Portainer**
+    Ports: 8001:80`"]
+    B --> E["`**Registry**
+    Ports: 8002:9000`"]
+    B --> F["`**Registry-UI**
+    Ports: 8003:8080`"]
 ```
 
 **Go to service directory**
