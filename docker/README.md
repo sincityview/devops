@@ -28,6 +28,9 @@ docker compose up -d
 ```
 
 **Host-machine Nginx conf**
+
+> Recommend implementing access controls to protect your Docker domain
+
 ```
     server_name registry.domain.ru;
 
