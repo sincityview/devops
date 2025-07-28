@@ -2,8 +2,7 @@
 ------
 
 **Scheme**
-```
-mermaid
+```mermaid
 flowchart LR
     A[Host:Nginx] --> B[Docker:Nginx]
     B --> C[Dozzle]
