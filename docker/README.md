@@ -10,7 +10,7 @@ flowchart LR
     B --> D[Portainer]
     B --> E[Registry]
     B --> F[Registry-UI]
-
+```
 
 **Go to service directory**
 ```
