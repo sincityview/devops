@@ -1,64 +1,88 @@
-docker run -d --rm --name=app-registry-srv -v data-registry:/var/lib/registry -e REGISTRY_HTTP_ADDR=127.0.0.1:5123 -p 5123:5123 registry:3
+#### Docker-portal
+------
+
+**Scheme**
+```
+mermaid
+flowchart LR
+    A[Host:Nginx] --> B[Docker:Nginx]
+    B --> C[Dozzle]
+    B --> D[Portainer]
+    B --> E[Registry]
+    B --> F[Registry-UI]
 
 
+**Go to service directory**
+```
+cd docker
+```
 
-server {
+**Startup docker containers**
+```
+docker compose up -d
+```
 
-    server_name registry.8two.ru;
+**Host-machine Nginx conf**
+```
+    server_name registry.domain.ru;
+
+    proxy_buffering off;
+    proxy_cache off;
+    proxy_http_version 1.1;
+    client_max_body_size 0;
 
     merge_slashes off;
     rewrite (.*)//+(.*) $1/$2 permanent;
 
     location / {
-        proxy_pass http://127.0.0.1:5123;
-        proxy_buffering off;
+        proxy_pass http://172.16.8.1:81/;
+        proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
     }
-
-    access_log /var/log/nginx/8two/registry-access.log;
-    error_log /var/log/nginx/8two/registry-error.log;
-
-    listen 443 ssl; # managed by Certbot
-    ssl_certificate /etc/letsencrypt/live/registry.8two.ru/fullchain.pem; # managed by Certbot
-    ssl_certificate_key /etc/letsencrypt/live/registry.8two.ru/privkey.pem; # managed by Certbot
-    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
-    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
-
-}
-
-nslookup registry.8two.ru
-
-venv/bin/certbot --nginx
+```
 
 
-docker tag nginx:1.29 registry.8two.ru/nginx
-docker push registry.8two.ru/nginx
+**Install SSL certificate**
+sudo apt install python3.11-venv -y
+
+mkdir -p /srv/certbot
+cd /srv/certbot
+python3 -m venv venv
+/venv/bin/pip install certbot-nginx
+/venv/bin/certbot --nginx
 
 
-https://registry.8two.ru/v2/_catalog
-https://registry.8two.ru/v2/memos/tags/list
+**Push images to registry**
+docker tag myimage:3.2 registry.domain.ru/myimage:3.2
+docker tag myimage:3.2 registry.domain.ru/myimage:latest
+docker push registry.domain.ru/myimage:3.2
+docker push registry.domain.ru/myimage:latest
 
-/v2/ — корневая точка входа
-/v2/_catalog — получение списка всех репозиториев
-/v2/{name}/tags/list — список тегов для репозитория
-/v2/{name}/manifests/{tag} — получение манифеста образа
-/v2/{name}/blobs/{digest} — работа со слоями образа
+curl https://registry.domain.ru/v2/_catalog
+{"repositories":["dozzle","nginx","myimage","portainer","registry","registry-ui"]}
+
+curl https://registry.domain.ru/v2/nginx/tags/list
+{"name":"myimage","tags":["3.2","latest"]}
 
 
-<!-- 
-registry:
-  restart: always
-  image: registry:3
-  ports:
-    - 5000:5000
-  environment:
-    REGISTRY_HTTP_TLS_CERTIFICATE: /certs/domain.crt
-    REGISTRY_HTTP_TLS_KEY: /certs/domain.key
-    REGISTRY_AUTH: htpasswd
-    REGISTRY_AUTH_HTPASSWD_PATH: /auth/htpasswd
-    REGISTRY_AUTH_HTPASSWD_REALM: Registry Realm
-  volumes:
-    - /path/data:/var/lib/registry
-    - /path/certs:/certs
-    - /path/auth:/auth 
--->
+**View docker stack services**
+```
+https://registry.domain.ru/registry
+https://registry.domain.ru/dozzle
+https://registry.domain.ru/portainer
+```
+
+**Output**
+```
+$ docker compose ps
+ 
+ Name                Command                  State                          Ports                   
+-----------------------------------------------------------------------------------------------------
+dozzle         /dozzle --base /dozzle           Up      10.1.2.1:8003->8080/tcp
+nginx          /docker-entrypoint.sh ngin ...   Up      0.0.0.0:81->80/tcp
+portainer      /portainer --http-enabled        Up      8000/tcp, 10.1.2.1:8002->9000/tcp, 9443/tcp
+registry-srv   /entrypoint.sh /etc/distri ...   Up      10.1.2.1:8000->5000/tcp
+registry-web   /docker-entrypoint.sh ngin ...   Up      10.1.2.1:8001->80/tcp
+```
