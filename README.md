@@ -1,9 +1,10 @@
-##### devops:
+### DevOps:
 ------
 
-[gogs](./gogs/) - docker compose self-hosted git service
+[Gogs](./gogs/) - Docker compose self-hosted git service
 
+<br />
 
-##### qa
+### QA
 ------
-[qa learning](./tester) - qa learning documentation
+[QA Learning](./tester) - QA Learning Documentation

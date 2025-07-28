@@ -26,7 +26,7 @@ docker exec -it -u git gogs bash -c \
     --admin=true"
 ```
 
-**View compose logs**
+**View docker stack logs**
 ```
 http://server_ip/dozzle
 ```
