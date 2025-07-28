@@ -1,4 +1,4 @@
 ### QA
 ------
 
-[QA Learning](./tester) - QA Learning Documentation
+[QA Learning](./theory) - QA Learning Documentation
