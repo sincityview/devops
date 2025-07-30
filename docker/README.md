@@ -1,4 +1,5 @@
 #### Docker images and network
+------
 
 **$ docker images**
 ```
@@ -11,11 +12,14 @@ python:3.10-slim
 docker network create app-network
 ```
 
+<br />
+
 #### Build mariadb for app
+------
 
-**$ cd mariadb**
+$ cd mariadb
 
-**$ cat Dockerfile**
+$ cat Dockerfile
 ```
 FROM mariadb:11.8.2
 
@@ -29,7 +33,7 @@ EXPOSE 3306
 VOLUME /var/lib/mysql
 ```
 
-**$ cat init.sql**
+$ cat init.sql
 ```
 CREATE DATABASE IF NOT EXISTS flask_app_db;
 CREATE USER 'flask_app_user'@'%' IDENTIFIED BY 'flask_app_password';
@@ -48,11 +52,11 @@ GRANT ALL PRIVILEGES ON flask_app_db.* TO 'flask_app_user'@'%';
 FLUSH PRIVILEGES;
 ```
 
-**$ docker build -t app-mariadb:11.8.2 .**
+$ docker build -t app-mariadb:11.8.2 .
 
-**$ docker run -d --rm --name=app-mariadb -v mariadb:/var/lib/mysql --network app-network -p 3306:3306 app-mariadb:11.8.2**
+$ docker run -d --rm --name=app-mariadb -v mariadb:/var/lib/mysql --network app-network -p 3306:3306 app-mariadb:11.8.2
 
-**docker exec -it app-mariadb bash -c "mariadb -uflask_app_user -pflask_app_password -e 'SELECT * from flask_app_db.users;'"**
+docker exec -it app-mariadb bash -c "mariadb -uflask_app_user -pflask_app_password -e 'SELECT * from flask_app_db.users;'"
 ```
 +----+---------------+----------------------------+
 | id | username      | email                      |
@@ -61,9 +65,9 @@ FLUSH PRIVILEGES;
 +----+---------------+----------------------------+
 ```
 
-**$ cd flask-app**
+$ cd flask-app
 
-**$ cat Dockerfile**
+$ cat Dockerfile
 ```
 FROM python:3.10-slim
 
@@ -79,11 +83,11 @@ EXPOSE 8000
 CMD ["gunicorn", "app:app", "-b 0:8000"]
 ```
 
-**$ docker build -t app-flask:3.10-slim .**
+$ docker build -t app-flask:3.10-slim .
 
-**$ docker run -d --rm --name=app-flask --network app-network -p 8000:8000 -e APP_DB_HOST=app-mariadb app-flask:3.10-slim**
+$ docker run -d --rm --name=app-flask --network app-network -p 8000:8000 -e APP_DB_HOST=app-mariadb app-flask:3.10-slim
 
-**$ curl 127.0.0.1:8000**
+$ curl 127.0.0.1:8000
 ```
 <!DOCTYPE html>
 <html>
