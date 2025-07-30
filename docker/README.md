@@ -1,6 +1,14 @@
 #### Docker images and network
 ------
 
+<br />
+flowchart LR
+    A[host:80] --> B[nginx:80:5000]
+    B --> C[flask:5000:5000]
+    C --> D[mariadb:3306:3306]
+
+<br />
+
 $ docker images
 ```
 mariadb:11.8.2
