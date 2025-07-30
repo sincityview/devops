@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Users</title>
+</head>
+<body>
+
+    Flask App with Mariadb connection: <br>
+    {% for user in users %}
+        username: {{ user.username }} <br>
+        email: {{ user.email }}
+    {% endfor %}
+
+</body>
+</html>
