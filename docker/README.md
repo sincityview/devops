@@ -1,13 +1,13 @@
 #### Docker images and network
 ------
 
-**$ docker images**
+$ docker images
 ```
 mariadb:11.8.2
 python:3.10-slim
 ```
 
-**Docker network create**
+Docker network create
 ```
 docker network create app-network
 ```
