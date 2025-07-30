@@ -14,7 +14,7 @@ docker network create app-network
 
 <br />
 
-#### Build mariadb for app
+#### Build and run app-mariadb
 ------
 
 $ cd mariadb
@@ -35,37 +35,43 @@ VOLUME /var/lib/mysql
 
 $ cat init.sql
 ```
-CREATE DATABASE IF NOT EXISTS flask_app_db;
-CREATE USER 'flask_app_user'@'%' IDENTIFIED BY 'flask_app_password';
-
-USE flask_app_db;
-
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(80) NOT NULL UNIQUE,
     email VARCHAR(120) NOT NULL UNIQUE
 );
 
-INSERT INTO users (username, email) VALUES('flask-mariadb', 'flask-mariadb@username.com')
-
-GRANT ALL PRIVILEGES ON flask_app_db.* TO 'flask_app_user'@'%';
-FLUSH PRIVILEGES;
+INSERT INTO users (username, email) VALUES('username', 'email@example.com');
 ```
 
 $ docker build -t app-mariadb:11.8.2 .
 
-$ docker run -d --rm --name=app-mariadb -v mariadb:/var/lib/mysql --network app-network -p 3306:3306 app-mariadb:11.8.2
+Environments for mariadb:
+```
+TZ
+MARIADB_ROOT_PASSWORD
+MARIADB_USER
+MARIADB_PASSWORD
+MARIADB_DATABASE
+```
+
+$ docker run -d --rm --name=app-mariadb --network app-network -p 3306:3306 app-mariadb:11.8.2
 
 docker exec -it app-mariadb bash -c "mariadb -uflask_app_user -pflask_app_password -e 'SELECT * from flask_app_db.users;'"
 ```
-+----+---------------+----------------------------+
-| id | username      | email                      |
-+----+---------------+----------------------------+
-|  1 | flask-mariadb | flask-mariadb@username.com |
-+----+---------------+----------------------------+
++----+----------+-------------------+
+| id | username | email             |
++----+----------+-------------------+
+|  1 | username | email@example.com |
++----+----------+-------------------+
 ```
 
-$ cd flask-app
+<br />
+
+#### Build and run app-flask
+------
+
+$ cd flask
 
 $ cat Dockerfile
 ```
@@ -87,7 +93,59 @@ $ docker build -t app-flask:3.10-slim .
 
 $ docker run -d --rm --name=app-flask --network app-network -p 8000:8000 -e APP_DB_HOST=app-mariadb app-flask:3.10-slim
 
-$ curl 127.0.0.1:8000
+<br />
+
+#### Build and run app-nginx
+------
+
+$ cd nginx
+
+$ cat Dockerfile
+```
+FROM nginx:1.29
+
+ENV APP_HOST=127.0.0.1
+
+COPY nginx.conf /etc/nginx/conf.d/default.conf.template
+COPY entrypoint.sh /entrypoint.sh
+
+RUN chmod +x /entrypoint.sh
+
+EXPOSE 80
+
+ENTRYPOINT ["/entrypoint.sh"]
+
+CMD ["nginx", "-g", "daemon off;"]
+```
+
+$ cat entrypoint.sh
+```
+#!/bin/bash
+set -e
+
+envsubst < /etc/nginx/conf.d/default.conf.template > /etc/nginx/conf.d/default.conf
+
+exec nginx -g "daemon off;"
+```
+
+$ cat nginx.conf
+```
+server {
+    
+    listen 80;
+
+    location / {
+        proxy_pass http://${APP_HOST}:5000/;
+    }
+
+}
+```
+
+$ docker build -t app-nginx:1.29 .
+
+$ docker run --rm --name=nginx --network app-network -p 8000:8000 -e APP_HOST=flask app-nginx:1.29
+
+$ curl localhost
 ```
 <!DOCTYPE html>
 <html>
@@ -97,9 +155,10 @@ $ curl 127.0.0.1:8000
 <body>
 
     Flask App with Mariadb connection: <br>
-        
-        username: flask-mariadb <br>
-        email: flask-mariadb@username.com
+    
+        username: username <br>
+        email: email@example.com
+    
 
 </body>
 </html>
