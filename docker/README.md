@@ -1,7 +1,4 @@
-#### Docker images and network
-------
-
-<br />
+#### Scheme container flask-app
 
 ```mermaid
 flowchart LR
@@ -11,6 +8,9 @@ flowchart LR
 ```
 
 <br />
+
+#### Docker images and network
+------
 
 $ docker images
 ```
