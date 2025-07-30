@@ -2,6 +2,7 @@
 ------
 
 <br />
+
 flowchart LR
     A[host:80] --> B[nginx:80:5000]
     B --> C[flask:5000:5000]
