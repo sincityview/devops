@@ -1,9 +1,11 @@
-### DevOps:
+### Learning DevOps:
 ------
 
+[Docker](./docker/) - First containers
+<br />
 [Gogs](./gogs/) - Docker compose self-hosted git service
 <br />
-[Docker](./docker/) - Private Docker Portal
+[Docker Compose](./docker-compose/) - Private Docker Portal
 
 <br />
 

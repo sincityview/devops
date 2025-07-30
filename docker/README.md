@@ -1,104 +1,102 @@
-#### Docker-portal
-------
+#### Docker images and network
 
-**Scheme**
-```mermaid
-flowchart LR
-    A["`**Host: Nginx**
-    Ports: 443:81`"] --> B["`**Docker: Nginx**
-    Ports: 81:80`"]
-    B --> C["`**Dozzle**
-    Ports: 8003:8080`"]
-    B --> D["`**Portainer**
-    Ports: 8002:9000`"]
-    B --> E["`**Registry**
-    Ports: 8000:5000`"]
-    B --> F["`**Registry-UI**
-    Ports: 8001:80`"]
+**$ docker images**
+```
+mariadb:11.8.2
+python:3.10-slim
 ```
 
-**Go to service directory**
+**Docker network create**
 ```
-cd docker
-```
-
-**Startup docker containers**
-```
-docker compose up -d
+docker network create app-network
 ```
 
-**Host-machine Nginx conf**
+#### Build mariadb for app
 
-> Recommend implementing access controls to protect your Docker domain
+**$ cd mariadb**
 
+**$ cat Dockerfile**
 ```
-    server_name registry.domain.ru;
+FROM mariadb:11.8.2
 
-    proxy_buffering off;
-    proxy_cache off;
-    proxy_http_version 1.1;
-    client_max_body_size 0;
+ENV MARIADB_ROOT_PASSWORD=db_root_password
+ENV TZ=Europe/Moscow
 
-    merge_slashes off;
-    rewrite (.*)//+(.*) $1/$2 permanent;
+COPY init.sql /docker-entrypoint-initdb.d/
 
-    location / {
-        proxy_pass http://172.16.8.1:81/;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
+EXPOSE 3306
+
+VOLUME /var/lib/mysql
 ```
 
+**$ cat init.sql**
+```
+CREATE DATABASE IF NOT EXISTS flask_app_db;
+CREATE USER 'flask_app_user'@'%' IDENTIFIED BY 'flask_app_password';
 
-**Install SSL certificate**
-```
-sudo apt install python3.11-venv -y
-```
+USE flask_app_db;
 
-```
-mkdir -p /srv/certbot
-cd /srv/certbot
-```
-```
-python3 -m venv venv
-/venv/bin/pip install certbot-nginx
-/venv/bin/certbot --nginx
-```
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(80) NOT NULL UNIQUE,
+    email VARCHAR(120) NOT NULL UNIQUE
+);
 
-**Push images to registry**
-```
-docker tag myimage:3.2 registry.domain.ru/myimage:3.2
-docker tag myimage:3.2 registry.domain.ru/myimage:latest
-docker push registry.domain.ru/myimage:3.2
-docker push registry.domain.ru/myimage:latest
-```
-```
-curl https://registry.domain.ru/v2/_catalog
-{"repositories":["dozzle","nginx","myimage","portainer","registry","registry-ui"]}
-```
-```
-curl https://registry.domain.ru/v2/nginx/tags/list
-{"name":"myimage","tags":["3.2","latest"]}
+INSERT INTO users (username, email) VALUES('flask-mariadb', 'flask-mariadb@username.com')
+
+GRANT ALL PRIVILEGES ON flask_app_db.* TO 'flask_app_user'@'%';
+FLUSH PRIVILEGES;
 ```
 
-**View docker stack services**
+**$ docker build -t app-mariadb:11.8.2 .**
+
+**$ docker run -d --rm --name=app-mariadb -v mariadb:/var/lib/mysql --network app-network -p 3306:3306 app-mariadb:11.8.2**
+
+**docker exec -it app-mariadb bash -c "mariadb -uflask_app_user -pflask_app_password -e 'SELECT * from flask_app_db.users;'"**
 ```
-https://registry.domain.ru/registry
-https://registry.domain.ru/dozzle
-https://registry.domain.ru/portainer
++----+---------------+----------------------------+
+| id | username      | email                      |
++----+---------------+----------------------------+
+|  1 | flask-mariadb | flask-mariadb@username.com |
++----+---------------+----------------------------+
 ```
 
-**Output**
+**$ cd flask-app**
+
+**$ cat Dockerfile**
 ```
-$ docker compose ps
- 
- Name                Command                  State                          Ports                   
------------------------------------------------------------------------------------------------------
-dozzle         /dozzle --base /dozzle           Up      10.1.2.1:8003->8080/tcp
-nginx          /docker-entrypoint.sh ngin ...   Up      0.0.0.0:81->80/tcp
-portainer      /portainer --http-enabled        Up      8000/tcp, 10.1.2.1:8002->9000/tcp, 9443/tcp
-registry-srv   /entrypoint.sh /etc/distri ...   Up      10.1.2.1:8000->5000/tcp
-registry-web   /docker-entrypoint.sh ngin ...   Up      10.1.2.1:8001->80/tcp
+FROM python:3.10-slim
+
+WORKDIR /app
+
+COPY . /app
+
+RUN apt-get update && apt-get install build-essential libmariadb-dev -y
+RUN pip install --no-cache-dir -U pip && pip install --no-cache-dir -r requirements.txt
+
+EXPOSE 8000
+
+CMD ["gunicorn", "app:app", "-b 0:8000"]
+```
+
+**$ docker build -t app-flask:3.10-slim .**
+
+**$ docker run -d --rm --name=app-flask --network app-network -p 8000:8000 -e APP_DB_HOST=app-mariadb app-flask:3.10-slim**
+
+**$ curl 127.0.0.1:8000**
+```
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Users</title>
+</head>
+<body>
+
+    Flask App with Mariadb connection: <br>
+        
+        username: flask-mariadb <br>
+        email: flask-mariadb@username.com
+
+</body>
+</html>
 ```
