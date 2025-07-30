@@ -7,8 +7,6 @@ flowchart LR
     C --> D[mariadb:3306:3306]
 ```
 
-<br />
-
 #### Docker images and network
 ------
 
