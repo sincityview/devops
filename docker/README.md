@@ -3,10 +3,12 @@
 
 <br />
 
+```mermaid
 flowchart LR
     A[host:80] --> B[nginx:80:5000]
     B --> C[flask:5000:5000]
     C --> D[mariadb:3306:3306]
+```
 
 <br />
 
