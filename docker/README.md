@@ -152,7 +152,7 @@ server {
 
 $ docker build -t app-nginx:1.29 .
 
-$ docker run --rm --name=nginx --network app-network -p 8000:8000 -e APP_HOST=flask app-nginx:1.29
+$ docker run -d --rm --name=nginx --network app-network -p 8000:8000 -e APP_HOST=flask app-nginx:1.29
 
 $ curl localhost
 ```
