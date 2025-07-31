@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
       - name: app-hello
-        image: docker.8two.ru/app-hello:v1
+        image: registry.domain.ru/app-hello:v1
         ports:
         - containerPort: 80
         resources:
