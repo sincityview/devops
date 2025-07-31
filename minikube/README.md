@@ -33,12 +33,18 @@ Server Version: v1.33.1
 
 $ cd app-k8s
 
-$ kubectl create namespace app-space
+$ kubectl create namespace app-k8s-dev
+```
+namespace/app-k8s-dev created
+```
+
+> Got aliases for managment with namespaces
+> alias kdev='kubectl -n app-k8s-dev'
 
 $ kubectl get namespace
 ```
 NAME                   STATUS   AGE
-app-space              Active   7s
+app-k8s-dev            Active   7s
 ```
 
 $ kubectl apply -f deployment.yaml 
@@ -46,13 +52,13 @@ $ kubectl apply -f deployment.yaml
 deployment.apps/app-hello created
 ```
 
-$ kubectl get deployment -n app-space
+$ kdev get deployment
 ```
 NAME        READY   UP-TO-DATE   AVAILABLE   AGE
 app-hello   0/1     1            0           14s
 ```
 
-$ kubectl get pod -n app-space
+$ kdev get pod
 ```
 NAME                         READY   STATUS             RESTARTS   AGE
 app-hello-6d4b64c5cc-kzwc7   0/1     ImagePullBackOff   0          19s
@@ -60,7 +66,7 @@ app-hello-6d4b64c5cc-kzwc7   0/1     ImagePullBackOff   0          19s
 
 $ kubectl apply -f service.yaml
 
-$ kubectl get service -n app-space
+$ kdev get service
 ```
 NAME          TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)          AGE
 app-service   NodePort    10.102.110.253   <none>        5000:30643/TCP   14m
@@ -73,13 +79,18 @@ minikube$ curl 10.102.110.253:5000
 Pod name is app-deployment-59fcc954f5-g7npj
 ```
 
-$ kubectl get ingress
+$ kubectl apply -f ingress.yaml
+```
+ingress.networking.k8s.io/app-ingress created
+```
+
+$ kdev get ingress
 ```
 NAME          CLASS    HOSTS   ADDRESS   PORTS   AGE
 app-ingress   <none>   *                 80      9s
 ```
 
-$ minikube service app-service -n app-space --url
+$ minikube service app-service -n app-k8s-dev --url
 ```
 http://192.168.49.2:30643
 ```
@@ -89,9 +100,9 @@ $ curl http://192.168.49.2:30643
 Pod name is app-deployment-59fcc954f5-g7npj
 ```
 
-$ kubectl scale deployment --replicas=4 app-deployment -n app-space
+$ kdev scale deployment --replicas=4 app-deployment
 
-$ kubectl get pods -n app-space
+$ kdev get pods
 ```
 NAME                              READY   STATUS    RESTARTS   AGE
 app-deployment-59fcc954f5-g7npj   1/1     Running   0          6m6s
