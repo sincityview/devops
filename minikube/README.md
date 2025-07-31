@@ -71,13 +71,6 @@ NAME          TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)          AGE
 app-service   NodePort    10.102.110.253   <none>        5000:30643/TCP   14m
 ```
 
-$ minikube ssh
-
-minikube$ curl 10.102.110.253:5000
-```
-Pod name is app-deployment-59fcc954f5-g7npj
-```
-
 $ kubectl apply -f ingress.yaml
 ```
 ingress.networking.k8s.io/app-ingress created
