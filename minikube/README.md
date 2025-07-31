@@ -38,7 +38,6 @@ $ kubectl create namespace app-k8s-dev
 namespace/app-k8s-dev created
 ```
 
-> Got aliases for managment with namespaces
 > alias kdev='kubectl -n app-k8s-dev'
 
 $ kubectl get namespace
@@ -61,7 +60,7 @@ app-hello   0/1     1            0           14s
 $ kdev get pod
 ```
 NAME                         READY   STATUS             RESTARTS   AGE
-app-hello-6d4b64c5cc-kzwc7   0/1     ImagePullBackOff   0          19s
+app-hello-6d4b64c5cc-kzwc7   1/1     Running            0          19s
 ```
 
 $ kubectl apply -f service.yaml
