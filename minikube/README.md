@@ -98,3 +98,5 @@ Pod name is app-deployment-59fcc954f5-pbrh7
 Pod name is app-deployment-59fcc954f5-jn8bs
 Pod name is app-deployment-59fcc954f5-hvksp
 ```
+
+> Balanced
