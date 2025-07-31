@@ -23,8 +23,9 @@ spec:
       containers:
       - name: app-hello
         image: registry.domain.ru/app-hello:v1
+        imagePullPolicy: IfNotPresent
         ports:
-        - containerPort: 80
+        - containerPort: 5000
         resources:
           requests:
             memory: "64Mi"
@@ -32,3 +33,15 @@ spec:
           limits:
             memory: "128Mi"
             cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 5000
+          initialDelaySeconds: 30
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 5000
+          initialDelaySeconds: 30
+          periodSeconds: 30
