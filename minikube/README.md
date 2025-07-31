@@ -1,6 +1,6 @@
 #### Docker buid app image
 
-$ cd docker
+$ cd app-docker
 
 $ docker build -t app-hello:v1 .
 
@@ -31,20 +31,28 @@ Kustomize Version: v5.6.0
 Server Version: v1.33.1
 ```
 
-$ cd app
+$ cd app-k8s
+
+$ kubectl create namespace app-space
+
+$ kubectl get namespace
+```
+NAME                   STATUS   AGE
+app-space              Active   7s
+```
 
 $ kubectl apply -f deployment.yaml 
 ```
 deployment.apps/app-hello created
 ```
 
-$ kubectl get deployment
+$ kubectl get deployment -n app-space
 ```
 NAME        READY   UP-TO-DATE   AVAILABLE   AGE
 app-hello   0/1     1            0           14s
 ```
 
-$ kubectl get pod
+$ kubectl get pod -n app-space
 ```
 NAME                         READY   STATUS             RESTARTS   AGE
 app-hello-6d4b64c5cc-kzwc7   0/1     ImagePullBackOff   0          19s
@@ -52,7 +60,7 @@ app-hello-6d4b64c5cc-kzwc7   0/1     ImagePullBackOff   0          19s
 
 $ kubectl apply -f service.yaml
 
-$ kubectl get service
+$ kubectl get service -n app-space
 ```
 NAME          TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)          AGE
 app-service   NodePort    10.102.110.253   <none>        5000:30643/TCP   14m
@@ -71,7 +79,7 @@ NAME          CLASS    HOSTS   ADDRESS   PORTS   AGE
 app-ingress   <none>   *                 80      9s
 ```
 
-$ minikube service app-service --url
+$ minikube service app-service -n app-space --url
 ```
 http://192.168.49.2:30643
 ```
@@ -81,9 +89,9 @@ $ curl http://192.168.49.2:30643
 Pod name is app-deployment-59fcc954f5-g7npj
 ```
 
-$ kubectl scale deployment --replicas=4 app-deployment
+$ kubectl scale deployment --replicas=4 app-deployment -n app-space
 
-$ kubectl get pods
+$ kubectl get pods -n app-space
 ```
 NAME                              READY   STATUS    RESTARTS   AGE
 app-deployment-59fcc954f5-g7npj   1/1     Running   0          6m6s
