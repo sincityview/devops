@@ -1,4 +1,4 @@
-###### create-vm.sh
+#### create-vm.sh
 
 > Использование: create-vm -d <domain> -r <ram_mb> -c <vcpus> -s <disk_gb> -i <iso_path> -n <network>
 
@@ -20,7 +20,7 @@ create-vm --domain debian-test --ram 4096 --vcpus 2 --disk-size 30 --iso /custom
 
 <br>
 
-###### destroy-vm.sh
+#### destroy-vm.sh
 
 > Использование: destroy-vm <domain>
 
