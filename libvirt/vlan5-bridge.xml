@@ -1,0 +1,12 @@
+<network>
+  <name>vlan5-net</name>
+  <forward mode='nat' dev='eno1'>
+    <interface dev='eno1'/>
+  </forward>
+  <bridge name='br5' stp='off' delay='0'/>
+  <ip address='10.254.5.1' netmask='255.255.255.0'>
+    <dhcp>
+      <range start='10.254.5.10' end='10.254.5.254'/>
+    </dhcp>
+  </ip>
+</network>
